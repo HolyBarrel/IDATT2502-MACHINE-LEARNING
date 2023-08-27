@@ -5,8 +5,8 @@ import pandas as pd
 # Read data from csv file
 data = pd.read_csv('length_weight.csv', sep=',', header=0, engine='python')
 
-x_train = torch.tensor(data.iloc[:, 0].values, dtype=torch.float32).reshape(-1, 1)
-y_train = torch.tensor(data.iloc[:, 1].values, dtype=torch.float32).reshape(-1, 1)
+x_train = torch.tensor(data.iloc[:, 0].values, dtype=torch.double).reshape(-1, 1)
+y_train = torch.tensor(data.iloc[:, 1].values, dtype=torch.double).reshape(-1, 1)
 
 # Prints first 5 rows of data
 print(data.head())
@@ -15,8 +15,8 @@ class LinearRegressionModel:
 
     def __init__(self):
         # Model variables
-        self.W = torch.tensor([[0.0]], dtype=torch.float32, requires_grad=True)  
-        self.b = torch.tensor([[0.0]], dtype=torch.float32, requires_grad=True)
+        self.W = torch.tensor([[0.0]], dtype=torch.double, requires_grad=True)  
+        self.b = torch.tensor([[0.0]], dtype=torch.double, requires_grad=True)
 
     # Predictor
     def f(self, x):
@@ -24,18 +24,15 @@ class LinearRegressionModel:
 
     # Uses Mean Squared Error
     def loss(self, x, y):
-        return torch.nn.functional.mse_loss(self.f(x), y) 
+        return torch.mean(torch.square(self.f(x) - y))
 
 model = LinearRegressionModel()
 
 # Optimize: adjust W and b to minimize loss using stochastic gradient descent
-optimizer = torch.optim.SGD([model.W, model.b], 0.00001)
-for epoch in range(10000):
+optimizer = torch.optim.SGD([model.W, model.b], 0.0001)
+for epoch in range(200000):
     model.loss(x_train, y_train).backward()  # Compute loss gradients
     optimizer.step()  # Perform optimization by adjusting W and b,
-    # similar to:
-    # model.W -= model.W.grad * 0.01
-    # model.b -= model.b.grad * 0.01
 
     optimizer.zero_grad()  # Clear gradients for next step
 
