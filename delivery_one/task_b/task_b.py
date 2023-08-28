@@ -15,7 +15,7 @@ z_train = torch.tensor(data["weight"].values, dtype=torch.double).reshape(-1, 1)
 # Prints first 5 rows of data
 print(data.head())
 
-class LinearRegressionModel:
+class LinearRegression3DModel:
 
     def __init__(self):
         # Model variables
@@ -34,7 +34,7 @@ class LinearRegressionModel:
     def parameters(self):
         return (self.W_1, self.W_2)
     
-model = LinearRegressionModel()
+model = LinearRegression3DModel()
 
 # Optimizes the model using the parameters (W_1 & W_2)  and b
 optimizer = torch.optim.SGD(model.parameters(), lr=1e-7)
