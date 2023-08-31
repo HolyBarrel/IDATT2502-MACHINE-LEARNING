@@ -39,7 +39,7 @@ model = LinearRegression3DModel()
 # Optimizes the model using the parameters (W_1 & W_2)  and b
 optimizer = torch.optim.SGD(model.parameters(), lr=1e-7)
 
-for epoch in range(1500000):
+for epoch in range(100):
     model.loss(x_train, y_train, z_train).backward()  # Compute loss gradients
     optimizer.step()  # Performs optimization step
 
