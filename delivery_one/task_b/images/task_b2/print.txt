@@ -1,0 +1,2 @@
+W = tensor([[0.0039],
+        [0.1037]], requires_grad=True), b = tensor([[0.0024]], requires_grad=True), loss = tensor(3.6381, grad_fn=<MeanBackward0>)

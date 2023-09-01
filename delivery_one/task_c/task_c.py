@@ -23,7 +23,7 @@ class NonLinearRegressionModel:
     # Predictor
 
     def f(self, x):
-        return 20 *  torch.sigmoid((x @ self.W + self.b)) + 31 
+        return 20 * torch.sigmoid((x @ self.W + self.b)) + 31 
     
     # Uses Mean Squared Error
     def loss(self, x, y):
