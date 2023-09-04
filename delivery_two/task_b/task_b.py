@@ -24,13 +24,19 @@ class NandOperatorModel:
     
 model = NandOperatorModel()
 
-optimizer = torch.optim.SGD([model.W, model.b], lr=0.1)
+optimizer = torch.optim.SGD([model.W, model.b], lr=0.5)
 
 
-for epoch in range(10000):
+for epoch in range(100000):
     model.loss(model.forward(x_train), y_train).backward()
     optimizer.step()
     optimizer.zero_grad()
+
+# Gets the predicted output for the training data
+with torch.no_grad():
+    y_pred_train = model.forward(x_train)
+
+print(f"W = {model.W.detach().numpy()}, b = {model.b.detach().numpy()}, loss = {model.loss(y_pred_train, y_train).item()}")
 
 
 a, b = np.meshgrid(np.linspace(0, 1, 15), np.linspace(0, 1, 15))
@@ -40,7 +46,6 @@ test_data = torch.tensor(np.column_stack((a.ravel(), b.ravel())), dtype=torch.fl
 with torch.no_grad():
     y_pred = model.forward(test_data)
     y_pred_sigmoid = torch.sigmoid(y_pred).numpy()
-
 
 y_pred_grid = y_pred_sigmoid.reshape(a.shape)
 
