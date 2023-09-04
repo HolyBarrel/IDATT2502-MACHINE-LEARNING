@@ -38,9 +38,14 @@ x_range = torch.linspace(0, 1, 10000).view(-1, 1)
 # Uses the model to get the y values
 y_range = torch.sigmoid(model.forward(x_range)).detach().numpy()
 
+# Rounds the values to the nearest integer (0 or 1)
+y_range_rounded = torch.round(torch.tensor(y_range)).numpy()
+
 # Plots the sigmoid curve
 plt.figure()
 plt.plot(x_range, y_range, label='Sigmoid Curve (Trained)', color='purple')
+
+plt.plot(x_range, y_range_rounded, label='Rounded values', color='gray', linestyle="dashed")
 
 # Plots the true values
 plt.scatter(x_train, y_train, color='black', label='True Values (for the NOT-operator)', marker='x', s=120)
