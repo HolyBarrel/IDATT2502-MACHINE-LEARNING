@@ -1,0 +1,12 @@
+GPU is not available, using CPU instead
+torch.Size([60000, 784])
+torch.Size([60000, 10])
+Accuracy:  tensor(0.0790)
+Accuracy:  tensor(0.5829)
+Accuracy:  tensor(0.8108)
+Accuracy:  tensor(0.8575)
+Accuracy:  tensor(0.8768)
+Accuracy:  tensor(0.8853)
+Accuracy:  tensor(0.8935)
+Accuracy:  tensor(0.8979)
+Achieved desired accuracy, stopping training.
