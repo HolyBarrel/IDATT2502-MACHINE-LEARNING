@@ -64,14 +64,17 @@ model = SoftMaxModel()
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0101)
 
+# Training loop
 for epoch in range(1500):
     model.train()
     model.loss(model.forward(x_train), y_train).backward()
     optimizer.step()
     optimizer.zero_grad()
 
+    # Print accuracy every 75th epoch
     if(epoch % 75 == 0): print("Accuracy: ", model.accuracy(x_test, y_test))
 
+    # Breaks the training loop if the desired accuracy is achieved
     if model.accuracy(x_test, y_test) >= 0.9:
         print("Achieved desired accuracy, stopping training.")
         # Creates a directory to save the weight images if it doesn't exist
