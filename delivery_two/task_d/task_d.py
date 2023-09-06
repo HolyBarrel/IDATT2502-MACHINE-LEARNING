@@ -3,6 +3,13 @@ import torchvision
 import matplotlib.pyplot as plt
 import os
 
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+    print("GPU is available and being used")
+else:
+    device = torch.device("cpu")
+    print("GPU is not available, using CPU instead")
+
 # Load observations from the mnist dataset. The observations are divided into a training set and a test set
 mnist_train = torchvision.datasets.MNIST('./data', train=True, download=True)
 x_train = mnist_train.data.reshape(-1, 784).float()  # Reshape input
@@ -55,7 +62,7 @@ class SoftMaxModel(torch.nn.Module):
 
 model = SoftMaxModel()
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0101)
 
 for epoch in range(1500):
     model.train()
@@ -79,7 +86,7 @@ for epoch in range(1500):
             weight_image = model.W.detach().numpy()[:, i].reshape(28, 28)
             
             # Plots the weights
-            plt.imshow(weight_image, cmap='blue')  
+            plt.imshow(weight_image, cmap='gray')  
             plt.title(f'Visualization of W for {i}')
             plt.axis('off')
             
@@ -98,5 +105,27 @@ for epoch in range(1500):
         plt.savefig(os.path.join(output_directory, f'guesses_vs_true_values.png'))
         plt.show()
 
+        # Number of images to show in the plot
+        num_images = 10
+
+        test_images = x_test[:num_images].reshape(-1, 28, 28)
+
+        # Get model predictions for these images
+        predictions = torch.argmax(model.forward(x_test[:num_images]), dim=1).detach().numpy()
+
+        # Plot images with predictions
+        fig, axes = plt.subplots(4, 4, figsize=(10, 10))
+        axes = axes.ravel()
+
+        for i in range(num_images):
+            axes[i].imshow(test_images[i], cmap='gray')
+            axes[i].set_title(f"Prediction: {predictions[i]}")
+            axes[i].axis('off')
+
+        plt.subplots_adjust(wspace=0.5)
+        plt.savefig(os.path.join(output_directory, 'model_guesses.png'))
+        plt.show()
+
         break
+
 
