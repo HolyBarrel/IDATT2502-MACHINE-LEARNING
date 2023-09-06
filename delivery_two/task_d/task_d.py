@@ -11,12 +11,12 @@ else:
     print("GPU is not available, using CPU instead")
 
 # Load observations from the mnist dataset. The observations are divided into a training set and a test set
-mnist_train = torchvision.datasets.MNIST('./data', train=True, download=True)
+mnist_train = torchvision.datasets.MNIST('./delivery_two/task_d/data', train=True, download=True)
 x_train = mnist_train.data.reshape(-1, 784).float()  # Reshape input
 y_train = torch.zeros((mnist_train.targets.shape[0], 10))  # Create output tensor
 y_train[torch.arange(mnist_train.targets.shape[0]), mnist_train.targets] = 1  # Populate output
 
-mnist_test = torchvision.datasets.MNIST('./data', train=False, download=True)
+mnist_test = torchvision.datasets.MNIST('./delivery_two/task_d/data', train=False, download=True)
 x_test = mnist_test.data.reshape(-1, 784).float()  # Reshape input
 y_test = torch.zeros((mnist_test.targets.shape[0], 10))  # Create output tensor
 y_test[torch.arange(mnist_test.targets.shape[0]), mnist_test.targets] = 1  # Populate output
@@ -78,7 +78,7 @@ for epoch in range(1500):
     if model.accuracy(x_test, y_test) >= 0.9:
         print("Achieved desired accuracy, stopping training.")
         # Creates a directory to save the weight images if it doesn't exist
-        output_directory = 'generated_images'
+        output_directory = './delivery_two/task_d/generated_images'
         if not os.path.exists(output_directory):
             os.makedirs(output_directory)
 
