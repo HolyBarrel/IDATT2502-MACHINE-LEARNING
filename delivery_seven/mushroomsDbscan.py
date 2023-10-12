@@ -79,21 +79,17 @@ plt.colorbar(ax.scatter(plot_eps, plot_min_samples, plot_silhouette_scores, c=pl
 plt.title('Silhouette Score vs. Eps and Min_samples')
 plt.show()
 
+X_reduced, labels = cluster_scan(data, corresponding_min_samples, corresponding_eps)
 
-for n_clusters in range(n_clusters_, 11):
-    # Performs K-Means clustering
-    kmeans = KMeans(n_clusters=n_clusters)
-    kmeans.fit(X_reduced)
-    y_kmeans = kmeans.predict(X_reduced)
-    
-    # Plots the clusters
-    fig = plt.figure(figsize=(10, 8))
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(X_reduced[:, 0], X_reduced[:, 1], X_reduced[:, 2], c=y_kmeans, s=50, cmap='cool', alpha=0.05)
-    centers = kmeans.cluster_centers_
-    ax.scatter(centers[:, 0], centers[:, 1], centers[:, 2], c='black', s=200, alpha=0.95)
-    
-    plt.title(f'K-Means Clustering with {n_clusters} Clusters')
-    plt.xlabel('First Principal Component (Captures Most Variance)')
-    plt.ylabel('Second Principal Component (Captures Second Most Variance)')
-    plt.show()
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+scatter = ax.scatter(X_reduced[:, 0], X_reduced[:, 1], X_reduced[:, 2], c=labels, cmap='viridis')
+
+plt.colorbar(scatter)
+
+ax.set_xlabel('PCA 1')
+ax.set_ylabel('PCA 2')
+ax.set_zlabel('PCA 3')
+ax.set_title(f'3D Visualization with Optimal eps: {corresponding_eps}, min_samples: {corresponding_min_samples}, and {len(set(labels))} Clusters')
+
+plt.show()
