@@ -18,7 +18,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 X_encoded = pd.get_dummies(data)
 
-pca = PCA(n_components=3) 
+pca = PCA(n_components=30) 
 
 X_reduced = pca.fit_transform(X_encoded)
 
@@ -43,7 +43,7 @@ silhouette_scores = compute_silhouette_scores(X_reduced, k_values)
 
 plot_silhouette_scores(k_values, silhouette_scores)
 
-optimal_k = k_values[silhouette_scores.index(max(silhouette_scores))] + 2
+optimal_k = k_values[silhouette_scores.index(max(silhouette_scores))]
 
 print(f'Optimal k: {optimal_k}')
 
