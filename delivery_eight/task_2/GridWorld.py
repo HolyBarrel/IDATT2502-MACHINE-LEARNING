@@ -3,12 +3,12 @@ from pygame.locals import *
 from time import sleep
 import numpy as np
 import matplotlib.pyplot as plt
-
+import math
 
 class GridWorldEnvironment:
     def __init__(self):
         self.gridSize = 40
-        self.resolution = [600, 520]
+        self.resolution = [520, 520]
         self.gridsInRow = self.resolution[0] // self.gridSize
         self.gridsInColumn = self.resolution[1] // self.gridSize
         self.grid = [[0 for _ in range(self.gridsInRow)] for _ in range(self.gridsInColumn)]
@@ -19,9 +19,7 @@ class GridWorldEnvironment:
         self.goalY = np.random.randint(0, self.gridsInColumn)
         self.grid[self.goalY][self.goalX] = 2
         self.grid[self.startY][self.startX] = 1
-        print(self.startX, self.startY)
-        print(self.goalX, self.goalY)
-        print(self.grid)
+        # print(self.grid)
 
     def reset(self):
         self.startX = np.random.randint(0, self.gridsInRow)
@@ -33,62 +31,63 @@ class GridWorldEnvironment:
 
     def step(self, action):
         if action == 'up':
-            new_y = max(0, self.startY - 1)
-            new_x = self.startX
+            newY = max(0, self.startY - 1)
+            newX = self.startX
         elif action == 'down':
-            new_y = min(self.gridsInColumn - 1, self.startY + 1)
-            new_x = self.startX
+            newY = min(self.gridsInColumn - 1, self.startY + 1)
+            newX = self.startX
         elif action == 'left':
-            new_x = max(0, self.startX - 1)
-            new_y = self.startY
+            newX = max(0, self.startX - 1)
+            newY = self.startY
         elif action == 'right':
-            new_x = min(self.gridsInRow - 1, self.startX + 1)
-            new_y = self.startY
+            newX = min(self.gridsInRow - 1, self.startX + 1)
+            newY = self.startY
 
         self.grid[self.startY][self.startX] = 0
-        self.startX, self.startY = new_x, new_y
-        self.grid[new_y][new_x] = 1 
+        self.startX, self.startY = newX, newY
+        self.grid[newY][newX] = 1
 
-        distance_to_goal = self.manhattan_distance(self.startX, self.startY, self.goalX, self.goalY)
+        distanceToGoal  = self.manhattanDistance(self.startX, self.startY, self.goalX, self.goalY)
           
-        if distance_to_goal == 0:
+        if distanceToGoal  == 0:
             reward = 1  
             done = True
         else:
-            reward = 1 - distance_to_goal ** 0.5
+            reward = 1 - distanceToGoal ** 0.5
+            #reward = math.exp(-distanceToGoal)
             done = False
 
-        next_state = (new_x, new_y)
-        return next_state, reward, done, {}
+        nextState = (newX, newY)
+        return nextState, reward, done, {}
     
-    def manhattan_distance(self, x1, y1, x2, y2):
+    def manhattanDistance(self, x1, y1, x2, y2):
         return abs(x1 - x2) + abs(y1 - y2)
 
-    def plotGrid(self, current_state):
+    def plotGrid(self, currentState):
         screen = pygame.display.set_mode(self.resolution)
         pygame.display.set_caption("GridWorld")
         screen.fill((255, 255, 255))
 
-        grid_color = (245, 145, 100) 
-        grid_size = self.gridSize
-        screen_width, screen_height = screen.get_size()
-        player_color = (0, 120, 120)
-        apple_color = (255, 20, 0)
+        gridColor = (245, 145, 100)
+        gridSize = self.gridSize
+        screenWidth, screenHeight = screen.get_size()
+        playerColor = (0, 120, 120)
+        appleColor = (255, 20, 0)
 
-        player_x, player_y = current_state
-        pygame.draw.rect(screen, player_color, (player_x * grid_size, player_y * grid_size, grid_size, grid_size))
+        playerX, playerY = currentState
+        pygame.draw.rect(screen, playerColor, (playerX * gridSize, playerY * gridSize, gridSize, gridSize))
 
-        apple_x = self.goalX * grid_size
-        apple_y = self.goalY * grid_size
-        pygame.draw.rect(screen, apple_color, (apple_x, apple_y, grid_size, grid_size))
+        appleX = self.goalX * gridSize
+        appleY = self.goalY * gridSize
+        pygame.draw.rect(screen, appleColor, (appleX, appleY, gridSize, gridSize))
 
         # Draws vertical lines
-        for x in range(0, screen_width, grid_size):
-            pygame.draw.line(screen, grid_color, (x, 0), (x, screen_height))
+        for x in range(0, screenWidth, gridSize):
+            pygame.draw.line(screen, gridColor, (x, 0), (x, screenHeight))
 
         # Draws horizontal lines
-        for y in range(0, screen_height, grid_size):
-            pygame.draw.line(screen, grid_color, (0, y), (screen_width, y))
+        for y in range(0, screenHeight, gridSize):
+            pygame.draw.line(screen, gridColor, (0, y), (screenWidth, y))
 
         pygame.display.flip()
 
@@ -103,14 +102,15 @@ class QLearner:
         self.qTable = {}
         self.sumOfRewards = []
 
-    def initialize_q_table(self):
+    def initializeQTable(self):
         for x in range(self.environment.gridsInRow):
             for y in range(self.environment.gridsInColumn):
                 self.qTable[(x, y)] = {action: 0 for action in self.environment.actions}
 
     def chooseAction(self, state, episodeIndex):
         p = np.random.uniform(0, 1)
-        if episodeIndex > 20000:
+
+        if episodeIndex > 2000:
             self.eps *= 0.999        
 
         if p < self.eps:
@@ -119,9 +119,8 @@ class QLearner:
             return max(self.qTable[state], key=self.qTable[state].get)
 
     def simulateLearning(self):
-        self.initialize_q_table()
-        success_count = 0 
-
+        self.initializeQTable()
+        successCount = 0
 
         for episodeIndex in range(self.maxEpisodes):
             state = self.environment.reset()
@@ -129,40 +128,37 @@ class QLearner:
             episodeRewards = 0
 
             while not done:
-
                 action = self.chooseAction(state, episodeIndex)
-                next_state, reward, done, _ = self.environment.step(action)
+                nextState, reward, done, _ = self.environment.step(action)
                 episodeRewards += reward
 
-                # Updates Q-value
-                old_value = self.qTable[state][action]
-                next_max = max(self.qTable[next_state].values())
-                new_value = (1 - self.a) * old_value + self.a * (reward + self.g * next_max)
-                self.qTable[state][action] = new_value
+                oldValue = self.qTable[state][action]
+                nextMax = max(self.qTable[nextState].values())
+                newValue = (1 - self.a) * oldValue + self.a * (reward + self.g * nextMax)
+                self.qTable[state][action] = newValue
 
-                state = next_state
+                state = nextState
 
             self.sumOfRewards.append(episodeRewards)
-            #print(f'Episode: {episodeIndex + 1}, Total Reward: {episodeRewards}')
 
-            if episodeRewards == 1:  
-                success_count += 1
+            if episodeRewards == 1:
+                successCount += 1
 
-            if success_count >= 5000:
+            if successCount >= 5000:
                 print("Reached the goal 5000 times. Stopping the simulation.")
                 break
 
-    def visualize_last_run(self):
+    def visualizeLastRun(self):
         state = self.environment.reset()
         done = False
         while not done:
-            self.environment.plotGrid(state)  # Updates Pygame window based on the current state
+            self.environment.plotGrid(state)
             action = self.chooseAction(state, 1)
-            next_state, reward, done, _ = self.environment.step(action)
-            state = next_state
-            sleep(1) 
+            nextState, reward, done, _ = self.environment.step(action)
+            state = nextState
+            sleep(1)
 
-    def plot_rewards(self):
+    def plotRewards(self):
         plt.figure(figsize=(10, 6))
         plt.plot(self.sumOfRewards)
         plt.xlabel('Episode')
@@ -175,6 +171,6 @@ if __name__ == "__main__":
     env = GridWorldEnvironment()
     q_learner = QLearner(env, a=0.1, eps=0.1, g=0.99, maxEpisodes=30000)
     q_learner.simulateLearning()
-    q_learner.plot_rewards()
+    q_learner.plotRewards()
     
-    q_learner.visualize_last_run()
+    q_learner.visualizeLastRun()
