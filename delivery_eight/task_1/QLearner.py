@@ -36,7 +36,7 @@ class QLearner:
         angleIndex = np.digitize(angle, angleBin - 1)
         aVelocityIndex = np.digitize(angularVelocity, aVelocityBin - 1)
 
-        # Clip the indices to ensure they are within the valid range
+        # Clips the indices to ensure they are within the valid range
         positionIndex = np.clip(positionIndex, 0, self.numberOfBinsArray[0] - 1)
         velocityIndex = np.clip(velocityIndex, 0, self.numberOfBinsArray[1] - 1)
         angleIndex = np.clip(angleIndex, 0, self.numberOfBinsArray[2] - 1)
@@ -90,7 +90,7 @@ class QLearner:
                     self.qTable[stateBeforeIndex + (action, )] += self.a * error
 
                 stateBefore = stateAfter
-            if selfLog:
+            if selfLog and episodeIndex % 100 == 0:
                 print(f'E: {episodeIndex}, R: {sum(episodeRewards)}')
             self.sumOfRewards.append(sum(episodeRewards))
 
@@ -179,10 +179,10 @@ import gym
 
 if __name__ == "__main__":
     # Creates a CartPole environment
-    environment = gym.make('CartPole-v1')  # , render_mode='human')
+    environment = gym.make('CartPole-v1')#, render_mode='human')
 
     # Defines parameters for Q-Learning
-    a = 0.1 # learning rate
+    a = 0.5 # learning rate
     eps = 0.2  # epsilon for epsilon-greedy policy
     g = 0.99  # discount factor
     maxEpisodes = 12000  # number of episodes
@@ -199,7 +199,7 @@ if __name__ == "__main__":
     # Instantiates QLearner and simulate learning
     qLearner = QLearner(environment, a, eps, g, maxEpisodes, numberOfBinsArray, lowerBounds, upperBounds)
 
-    qLearner.simulateLearning()
+    qLearner.simulateLearning(selfLog=True)
     qLearner.plotRewards(eps)
 
     # Simulates the optimal learned strategy
